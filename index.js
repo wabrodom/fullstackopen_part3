@@ -34,7 +34,7 @@ let persons = [
 ];
 
 app.get("/", (request, response) => {
-  response.send("<h1>exercises 3.1</h1>");
+  response.send("<h1>exercises backend with nodejs and express</h1>");
 });
 
 app.get("/info", (request, response) => {
