@@ -1,7 +1,9 @@
 const express = require("express");
-const morgan = require('morgan')
+const morgan = require('morgan');
+const cors = require('cors')
 const app = express();
 
+app.use(cors())
 app.use(express.json());
 
 morgan.token('data', function (req, res) { return JSON.stringify(req.body) })
@@ -110,5 +112,7 @@ app.post("/api/persons", (request, response) => {
   response.json(newPerson);
 });
 
-const PORT = 3001;
-app.listen(PORT);
+const PORT = process.env.PORT || 3001;
+app.listen(PORT, () => {
+  console.log(`Server running at ${PORT}`)
+});
