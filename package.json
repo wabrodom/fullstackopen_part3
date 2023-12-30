@@ -7,16 +7,17 @@
     "start": "node index.js",
     "dev": "nodemon index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build:ui" : "rm -rf dist && cd ../fullstackopen/part2/phonebook/ && npm run build && cp -r dist ../../../fullstackopen_part3/",
-    "deploy" : "fly deploy",
-    "deploy:full" : "npm run build:ui && npm run deploy",
-    "logs:prod" : "fly logs"
+    "build:ui": "rm -rf dist && cd ../fullstackopen/part2/phonebook/ && npm run build && cp -r dist ../../../fullstackopen_part3/",
+    "deploy": "fly deploy",
+    "deploy:full": "npm run build:ui && npm run deploy",
+    "logs:prod": "fly logs"
   },
   "author": "warodom",
   "license": "ISC",
   "dependencies": {
     "cors": "^2.8.5",
     "express": "^4.18.2",
+    "mongoose": "^8.0.3",
     "morgan": "^1.10.0"
   },
   "devDependencies": {
