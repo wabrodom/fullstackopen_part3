@@ -13,6 +13,15 @@ app.use(morgan(':method :url :status :res[content-length] - :response-time ms :d
 
 app.use(express.static('dist'))
 
+const errorHandle = (error, request, response, next) => {
+  console.log(error.message) 
+
+  if (error.name === "CastError") {
+    return response.status(400).send({error : 'malformatted id'})
+  }
+  next(error)
+}
+
 let persons = [
   {
     id: 1,
@@ -66,11 +75,12 @@ app.get("/api/persons/:id", (request, response) => {
   }
 });
 
-app.delete("/api/persons/:id", (request, response) => {
-  const id = Number(request.params.id);
-  persons = persons.filter((p) => p.id !== id);
-
-  response.status(204).end();
+app.delete("/api/persons/:id", (request, response, next) => {
+  Person.findByIdAndDelete(request.params.id)
+    .then(result => {
+      response.status(204).end()
+    })
+    .catch(error => next(error))
 });
 
 const randomId = (arr) => {
@@ -82,30 +92,12 @@ app.post("/api/persons", (request, response) => {
   const body = request.body;
   const name = body.name;
   const number = body.number;
-  // const allNames = persons.map((p) => p.name);
-  // const duplicate = allNames.includes(name);
 
   if (!name || !number) {
     return response.status(400).json({
       error: "400 Bad Request: name or number are missing",
     });
   }
-
-  // if (!number && duplicate) {
-  //   return response.status(400).json({
-  //     error: "400 Bad Request: name is duplicate and number is missing",
-  //   });
-  // }
-
-  // if (!number) {
-  //   return response.status(400).json({
-  //     error: "400 Bad Request: number missing",
-  //   });
-  // }
-
-  // if (duplicate) {
-  //   return response.status(400).json({ error: "name must be unique" });
-  // }
 
   const newPerson = new Person({
     name: body.name,
@@ -117,6 +109,8 @@ app.post("/api/persons", (request, response) => {
   })
 
 });
+
+app.use(errorHandle)
 
 const PORT = process.env.PORT;
 app.listen(PORT, () => {
