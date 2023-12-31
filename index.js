@@ -82,39 +82,40 @@ app.post("/api/persons", (request, response) => {
   const body = request.body;
   const name = body.name;
   const number = body.number;
-  const allNames = persons.map((p) => p.name);
-  const duplicate = allNames.includes(name);
+  // const allNames = persons.map((p) => p.name);
+  // const duplicate = allNames.includes(name);
 
-  if (!name) {
+  if (!name || !number) {
     return response.status(400).json({
-      error: "400 Bad Request: name missing",
+      error: "400 Bad Request: name or number are missing",
     });
   }
 
-  if (!number && duplicate) {
-    return response.status(400).json({
-      error: "400 Bad Request: name is duplicate and number is missing",
-    });
-  }
+  // if (!number && duplicate) {
+  //   return response.status(400).json({
+  //     error: "400 Bad Request: name is duplicate and number is missing",
+  //   });
+  // }
 
-  if (!number) {
-    return response.status(400).json({
-      error: "400 Bad Request: number missing",
-    });
-  }
+  // if (!number) {
+  //   return response.status(400).json({
+  //     error: "400 Bad Request: number missing",
+  //   });
+  // }
 
-  if (duplicate) {
-    return response.status(400).json({ error: "name must be unique" });
-  }
+  // if (duplicate) {
+  //   return response.status(400).json({ error: "name must be unique" });
+  // }
 
-  const newPerson = {
-    id: randomId(persons),
+  const newPerson = new Person({
     name: body.name,
     number: body.number,
-  };
+  });
 
-  persons = persons.concat(newPerson);
-  response.json(newPerson);
+  newPerson.save().then(returnedPerson => {
+    response.json(returnedPerson)
+  })
+
 });
 
 const PORT = process.env.PORT;
