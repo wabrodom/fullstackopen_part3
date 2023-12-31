@@ -1,7 +1,9 @@
+require('dotenv').config()
 const express = require("express");
 const morgan = require('morgan');
 const cors = require('cors')
 const app = express();
+const Person = require('./models/phonebook')
 
 app.use(cors())
 app.use(express.json());
@@ -45,8 +47,10 @@ app.get("/info", (request, response) => {
   response.send(`${personsLengthText} ${time}`);
 });
 
-app.get("/api/persons", (request, response) => {
-  response.json(persons);
+app.get("/api/persons", (request, response) => {  
+  Person.find({}).then(phonebook => {
+    response.json(phonebook)
+  })
 });
 
 app.get("/api/persons/:id", (request, response) => {
@@ -113,7 +117,7 @@ app.post("/api/persons", (request, response) => {
   response.json(newPerson);
 });
 
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT;
 app.listen(PORT, () => {
   console.log(`Server running at ${PORT}`)
 });
