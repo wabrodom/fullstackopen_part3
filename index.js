@@ -49,11 +49,15 @@ app.get("/", (request, response) => {
   response.send("<h1>exercises backend with nodejs and express</h1>");
 });
 
-app.get("/info", (request, response) => {
-  const personsLength = persons.length;
-  const personsLengthText = `<p> Phonebook has info for ${personsLength} people.</p>`;
-  const time = `<p>${new Date()}</p>`;
-  response.send(`${personsLengthText} ${time}`);
+app.get("/info", (request, response, next) => {
+  Person.countDocuments({})
+    .then(info => {
+      const personsLength = info
+      const personsLengthText = `<p> Phonebook has info for ${personsLength} people.</p>`;
+      const time = `<p>${new Date()}</p>`;
+      response.send(`${personsLengthText} ${time}`);
+    })
+    .catch(error => next(error))
 });
 
 app.get("/api/persons", (request, response) => {  
@@ -62,17 +66,18 @@ app.get("/api/persons", (request, response) => {
   })
 });
 
-app.get("/api/persons/:id", (request, response) => {
-  const id = Number(request.params.id);
-  const person = persons.find((p) => p.id === id);
-
-  if (person) {
-    return response.json(person);
-  } else {
-    response.statusCode = 404;
-    response.statusMessage = "Not found person identifier";
-    response.send("not found the person");
-  }
+app.get("/api/persons/:id", (request, response, next) => {
+  Person.findById(request.params.id)
+    .then(foundPerson => {
+      if (foundPerson) {
+        return response.json(foundPerson)
+      } else {
+        response.statusCode = 404;
+        response.statusMessage = "Not found person identifier";
+        response.send("not found the person")
+      }
+    })
+    .catch(error => next(error)) 
 });
 
 app.delete("/api/persons/:id", (request, response, next) => {
@@ -109,6 +114,20 @@ app.post("/api/persons", (request, response) => {
   })
 
 });
+
+app.put('/api/persons/:id', (request, response, next) => {
+  const body = request.body
+  
+  const updatePerson = {
+    name: body.name,
+    number: body.number,
+  }
+  Person.findByIdAndUpdate(request.params.id, updatePerson, {new : true})
+    .then(updatedPerson => {
+      response.json(updatedPerson)
+    })
+    .catch(error => next(error))
+})
 
 app.use(errorHandle)
 
