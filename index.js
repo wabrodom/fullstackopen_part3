@@ -18,7 +18,10 @@ const errorHandle = (error, request, response, next) => {
 
   if (error.name === "CastError") {
     return response.status(400).send({error : 'malformatted id'})
+  } else if (error.name === "ValidationError") {
+    return response.status(400).json({error : error.message})
   }
+
   next(error)
 }
 
@@ -88,12 +91,8 @@ app.delete("/api/persons/:id", (request, response, next) => {
     .catch(error => next(error))
 });
 
-const randomId = (arr) => {
-  const random = Math.random() * arr.length * 1000;
-  return Math.floor(random);
-};
 
-app.post("/api/persons", (request, response) => {
+app.post("/api/persons", (request, response, next) => {
   const body = request.body;
   const name = body.name;
   const number = body.number;
@@ -109,9 +108,11 @@ app.post("/api/persons", (request, response) => {
     number: body.number,
   });
 
-  newPerson.save().then(returnedPerson => {
+  newPerson.save()
+    .then(returnedPerson => {
     response.json(returnedPerson)
-  })
+    })
+    .catch(error => next(error))
 
 });
 
@@ -122,7 +123,11 @@ app.put('/api/persons/:id', (request, response, next) => {
     name: body.name,
     number: body.number,
   }
-  Person.findByIdAndUpdate(request.params.id, updatePerson, {new : true})
+  Person.findByIdAndUpdate(
+    request.params.id,
+    updatePerson, 
+    {new : true, runValidators: true, context: "query"}
+  )
     .then(updatedPerson => {
       response.json(updatedPerson)
     })
@@ -135,3 +140,8 @@ const PORT = process.env.PORT;
 app.listen(PORT, () => {
   console.log(`Server running at ${PORT}`)
 });
+
+// const randomId = (arr) => {
+//   const random = Math.random() * arr.length * 1000;
+//   return Math.floor(random);
+// };
