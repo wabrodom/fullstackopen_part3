@@ -6,7 +6,7 @@ const url = process.env.MONGODB_URI
 
 console.log('start connecting to mongoDB')
 mongoose.connect(url)
-  .then(result =>{
+  .then(result => {
     console.log('connected to MongoDB.')
   })
   .catch((error) => {
@@ -26,15 +26,15 @@ const phonebookSchema = new mongoose.Schema({
     // the first part has two or three numbers and the second part also consists of numbers
     validate: {
       validator: function(value) {
-        if (value.split("-")[0].length < 3) {
-          const pattern  =/(^\d{2}-)(\d{6,})$/;
+        if (value.split('-')[0].length < 3) {
+          const pattern  =/(^\d{2}-)(\d{6,})$/
           return pattern.test(value)
         } else {
-          const pattern  = /^([0-9]{3}-)([0-9]{5,})$/;
+          const pattern  = /^([0-9]{3}-)([0-9]{5,})$/
           return pattern.test(value)
         }
-     },
-     message : props => `${props.value} is not valid phone number.`
+      },
+      message : props => `${props.value} is not valid phone number.`
     },
     required: true,
   }
@@ -42,10 +42,10 @@ const phonebookSchema = new mongoose.Schema({
 
 phonebookSchema.set('toJSON', {
   transform: (document, returnedObject) => {
-    returnedObject.id = returnedObject._id.toString();
-    delete returnedObject._id;
-    delete returnedObject.__v;
+    returnedObject.id = returnedObject._id.toString()
+    delete returnedObject._id
+    delete returnedObject.__v
   }
 })
 
-module.exports = mongoose.model("Person", phonebookSchema)
+module.exports = mongoose.model('Person', phonebookSchema)
